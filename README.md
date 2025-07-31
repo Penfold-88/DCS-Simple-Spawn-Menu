@@ -103,6 +103,16 @@ Installation is like any other script but keep in mind Mission Scripting Tools a
 9. Create your groups with the correct names.
 10. Profit!
 
+## Messages
+Eanble & Disable Messages 
+
+```local enableObjectiveMessages = true```
+
+Default Messages
+
+```Objective Activated!```
+```Objective Deactivated!```
+
 ## Media
 DCS Simple Spawn Menu Discord: For all your questions you can go to this [Discord Server](https://discord.gg/8VbKnKvN5r)
 
