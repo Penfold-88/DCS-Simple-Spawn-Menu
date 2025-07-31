@@ -19,26 +19,8 @@ local bulkIdentifier = '*'
 -- If set to false nothing will happen
 local respawn = true
 
-
--- Enable or disable objective announcement
-local announceObjectives = true  -- Set to false to disable all objective announcements
-
--- Default broadcast messages
-local objectiveSpawnedMsg = "New Objective Active!"
-local objectiveDespawnedMsg = "Objective Deactivated!"
-
--- Per-group custom broadcast messages (optional)
--- Format: ["GroupName"] = { spawn = "...", despawn = "..." }
-local objectiveMessages = {
-    ["!?Objectives?A2G?Convoys?Sochi-Adler?!Weapons-Safe"] = {
-        spawn = "Unarmed Sochi Convoy Now on patrol",
-        despawn = "Unarmed Sochi ConvoyObjective is no longer available."
-    },
-    ["!?Objectives?A2G?Mini-Missions?*War-Games-MP*!G1-2"] = {
-        spawn = "War Games Active",
-        despawn = "War Games Ended"
-    }
-}
+-- Toggle broadcast messages
+local enableObjectiveMessages = true
 
 -- DO NOT EDIT BELOW THIS LINE --
 -- Added a WARN level logger to help with debugging
@@ -215,27 +197,7 @@ local function parseGroup(group)
 end
 
 -- Spawn or respawns a group
-
--- Sends a broadcast message to all players if enabled and the group matches pattern
-local function maybeAnnounce(groupName, defaultMessage, isSpawn)
-    if not announceObjectives then return end
-    if not string.match(groupName, "!%?.+%?!") then return end
-
-    local msg = defaultMessage
-
-    if objectiveMessages[groupName] then
-        if isSpawn and objectiveMessages[groupName].spawn then
-            msg = objectiveMessages[groupName].spawn
-        elseif not isSpawn and objectiveMessages[groupName].despawn then
-            msg = objectiveMessages[groupName].despawn
-        end
-    end
-
-    trigger.action.outText(msg, 10)
-end
-
 local function spawnGroup(groupName)
-    maybeAnnounce(groupName, objectiveSpawnedMsg, true)
     if Group.getByName(groupName) then
         if respawn then
             mist.respawnGroup(groupName, true)
@@ -245,12 +207,13 @@ local function spawnGroup(groupName)
     else
         mist.respawnGroup(groupName, true)
     end
+    if enableObjectiveMessages then trigger.action.outText("Objective Activated!", 10) end
 end
 
 -- Despawns a group
 local function despawnGroup(groupName)
-    maybeAnnounce(groupName, objectiveDespawnedMsg, false)
     Group.destroy(Group.getByName(groupName))
+    if enableObjectiveMessages then trigger.action.outText("Objective Deactivated!", 10) end
 end
 
 -- Spawns a bulk
@@ -266,6 +229,7 @@ local function spawnBulk(bulk)
             mist.respawnGroup(groupName, true)
         end
     end
+    if enableObjectiveMessages then trigger.action.outText("Objective Activated!", 10) end
 end
 
 -- Despawns a bulk
@@ -273,6 +237,7 @@ local function despawnBulk(bulk)
     for groupName, group in pairs(bulk) do
         Group.destroy(Group.getByName(groupName))
     end
+    if enableObjectiveMessages then trigger.action.outText("Objective Deactivated!", 10) end
 end
 
 local function addToMenu(groupDBName, parentMenu)
